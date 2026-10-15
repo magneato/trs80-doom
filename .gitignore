@@ -1,0 +1,19 @@
+# --- Freedoom's checkout is fetched by setup.sh (BSD licence; not kept in this repository)
+freedoom/
+# --- generated
+build/
+release/
+tools/
+screenshots/_*
+__pycache__/
+*.pyc
+trs80-*.txt
+trs80-*.gif
+trs80-*.bin
+trs80-*.flv
+# --- editor / OS
+*~
+*.swp
+.DS_Store
+.vscode/
+.idea/

@@ -1,0 +1,2 @@
+  7001 breaths in 816.7 s of Model 4 time (T-states / 4.055 MHz): 8.6 breaths a second on average
+  autopilot: PASS  (last: health 68 ammo 37 lives 2 score 020900; 16 reports)

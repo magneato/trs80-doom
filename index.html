@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DOOM on the Model 4</title>
+<meta name="description" content="Freedoom's E1M1 running on a stock 128 KB TRS-80 Model 4, drawn in 2 x 3 block characters. A first running demo; collaboration welcome.">
+<meta property="og:title" content="DOOM on the TRS-80 Model 4">
+<meta property="og:description" content="Freedoom's E1M1 on a 4 MHz Z80 with an 80 x 24 text screen. A first running demo; collaboration welcome.">
+<meta property="og:image" content="media/shot1.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* black, white and greys; red, yellow and blue are the only colours */
+  --black: #000;
+  --g1: #111;
+  --g2: #262626;
+  --g3: #555;
+  --g4: #9a9a9a;
+  --white: #f2f2f2;
+  --red: #e3170a;
+  --yellow: #ffd400;
+  --blue: #1f4fff;
+  --max: 1060px;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--black); color: var(--white);
+  font: 16px/1.65 "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+body::after {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 10;
+  background: repeating-linear-gradient(to bottom, transparent 0 2px, rgba(0,0,0,.2) 2px 3px);
+}
+a { color: var(--white); text-decoration-color: var(--blue); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+a:hover { color: var(--black); background: var(--white); }
+.wrap { max-width: var(--max); margin: 0 auto; padding: 0 16px; }
+h1, h2, .vt { font-family: "VT323", ui-monospace, monospace; font-weight: 400; }
+h1 { font-size: clamp(46px, 8.5vw, 88px); line-height: .92; margin: 0 0 14px; letter-spacing: .01em; }
+h2 { font-size: clamp(30px, 5vw, 42px); margin: 0 0 14px; display: flex; align-items: center; gap: 12px; }
+h2::before { content: ""; width: 14px; height: 14px; background: var(--c, var(--red)); flex: none; }
+p { margin: 0 0 14px; }
+.dim { color: var(--g4); }
+section { padding: 52px 0; border-top: 1px solid var(--g2); }
+
+.dos { font-family: "VT323", monospace; font-size: 22px; padding-top: 18px; color: var(--white); }
+.dos .cur { display: inline-block; width: .55em; height: 1em; background: var(--white); vertical-align: -2px; animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+.hero { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; align-items: center; padding: 26px 0 52px; }
+.kicker { font-family: "VT323", monospace; font-size: 23px; color: var(--g4); letter-spacing: .06em; }
+.lede { font-size: 17px; }
+.bar { display: flex; height: 8px; margin: 18px 0 20px; max-width: 220px; }
+.bar i { flex: 1; } .bar i:nth-child(1) { background: var(--red); } .bar i:nth-child(2) { background: var(--yellow); } .bar i:nth-child(3) { background: var(--blue); }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn { font: 600 14px "IBM Plex Mono", monospace; color: var(--white); background: var(--blue); border: 0; padding: 10px 16px; text-decoration: none; cursor: pointer; }
+.btn.alt { background: transparent; border: 1px solid var(--white); }
+.btn:hover { background: var(--white); color: var(--black); }
+
+.stage { border: 1px solid var(--g3); background: var(--black); padding: 10px; }
+.stage canvas { display: block; width: 100%; height: auto; image-rendering: pixelated; }
+.marquee { font-family: "VT323", monospace; font-size: 22px; text-align: center; letter-spacing: .14em; margin-bottom: 6px; color: var(--white); }
+.marquee b { color: var(--red); font-weight: 400; }
+.controls { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 10px; font-size: 13px; color: var(--g4); }
+.controls input[type=range] { accent-color: var(--blue); width: 140px; }
+.controls .btn { padding: 6px 12px; font-size: 13px; }
+
+.note { border-left: 6px solid var(--yellow); background: var(--g1); padding: 18px 20px; font-size: 17px; }
+.note p:last-child { margin: 0; }
+
+.video { border: 1px solid var(--g3); background: #000; }
+.video video { display: block; width: 100%; height: auto; }
+.shots { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
+.shots figure { margin: 0; background: var(--g1); border: 1px solid var(--g2); }
+.shots figure:nth-child(-n+2) { grid-column: span 3; }
+.shots figure:nth-child(n+3) { grid-column: span 2; }
+.shots img { display: block; width: 100%; height: auto; image-rendering: pixelated; cursor: zoom-in; }
+.shots figcaption { padding: 9px 12px 11px; font-size: 13px; color: var(--g4); }
+
+ul.plain { margin: 0; padding: 0; list-style: none; }
+ul.plain li { padding: 7px 0 7px 22px; position: relative; border-bottom: 1px solid var(--g2); }
+ul.plain li::before { content: ""; position: absolute; left: 0; top: 15px; width: 8px; height: 8px; background: var(--g3); }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; }
+pre.cmd { background: var(--g1); border: 1px solid var(--g2); padding: 14px 16px; overflow-x: auto; font-size: 14px; margin: 0 0 14px; }
+.keys { border-collapse: collapse; font-size: 14px; }
+.keys td { padding: 5px 16px 5px 0; vertical-align: top; border-bottom: 1px solid var(--g2); }
+.keys td:first-child { white-space: nowrap; }
+footer { padding: 36px 0 56px; border-top: 1px solid var(--g2); font-size: 13px; color: var(--g4); }
+footer p { max-width: 64em; }
+
+.lb { position: fixed; inset: 0; background: rgba(0,0,0,.94); display: none; align-items: center; justify-content: center; z-index: 20; padding: 16px; cursor: zoom-out; }
+.lb.open { display: flex; }
+.lb img { max-width: 100%; max-height: 100%; image-rendering: pixelated; }
+
+@media (max-width: 860px) {
+  .hero, .two { grid-template-columns: 1fr; }
+  .shots { grid-template-columns: 1fr; }
+  .shots figure:nth-child(n) { grid-column: auto; }
+}
+@media (prefers-reduced-motion: reduce) { .dos .cur { animation: none; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="dos" aria-hidden="true"><span id="dosline"></span><span class="cur"></span></div>
+
+  <div class="hero">
+    <div>
+      <div class="kicker">TRS-80 MODEL 4 &middot; Z80 4 MHz &middot; 128 KB &middot; 80&times;24 TEXT</div>
+      <h1>DOOM<br>IN BLOCK<br>GRAPHICS</h1>
+      <p class="lede">Freedoom's first level, E1M1, running on a stock Model 4. The machine has no bitmap screen, so I
+        draw the view with the character set's 2&nbsp;&times;&nbsp;3 block characters. The status bar is plain text,
+        and the sound comes from the one-bit speaker.</p>
+      <div class="bar" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="btns">
+        <a class="btn" href="#demo">&#9654; Watch the demo</a>
+        <a class="btn alt" href="#run">Run it</a>
+      </div>
+    </div>
+    <div>
+      <div class="stage">
+        <div class="marquee"><b>&#9632;</b> THE DANCING DEMON <b>&#9632;</b></div>
+        <canvas id="stage" width="640" height="480" aria-label="A block-graphics demon dancing on a stage between curtains"></canvas>
+        <div class="controls">
+          <button class="btn" id="play">&#9835; Play the tune</button>
+          <label>Tempo <input type="range" id="tempo" min="80" max="240" value="150"></label>
+          <span id="bpm">150 bpm</span>
+        </div>
+      </div>
+      <p class="dim" style="font-size:12px;margin-top:8px">A nod to Leo Christopherson's <i>Dancing Demon</i> (1979) for the
+        TRS-80. This demon is my own drawing in the same block characters, not his.</p>
+    </div>
+  </div>
+</div>
+
+<section id="about" style="--c: var(--yellow)">
+  <div class="wrap">
+    <h2>A first running demo</h2>
+    <div class="note">
+      <p>This is the first running demo. I welcome collaboration: ideas, fixes, pull requests, and above all reports
+        from real Model 4s.</p>
+      <p>I left out some hacks that don't seem to work on every Model 4. This could be pushed a bit further.</p>
+    </div>
+  </div>
+</section>
+
+<section id="demo" style="--c: var(--red)">
+  <div class="wrap">
+    <h2>The demo</h2>
+    <p class="dim">Eight minutes in trs80gp, set up as an original Model 4, at normal speed with sound. TRSDOS boots,
+      the program loads, and the computer plays E1M1 (press <b>T</b> to let it): it walks, fights, and presses the exit
+      switch more than once.</p>
+    <div class="video">
+      <video controls preload="metadata" poster="media/poster.png">
+        <source src="media/demo.mp4" type="video/mp4">
+        Your browser can't play this video. <a href="media/demo.mp4">Download demo.mp4</a>.
+      </video>
+    </div>
+  </div>
+</section>
+
+<section id="shots" style="--c: var(--blue)">
+  <div class="wrap">
+    <h2>Screens</h2>
+    <div class="shots" id="gallery">
+      <figure><img src="media/shot1.png" alt="E1M1 in block graphics, health 82 percent, two kills" loading="lazy"><figcaption>Standing still in E1M1. Two kills so far.</figcaption></figure>
+      <figure><img src="media/shot2.png" alt="A fight: the message line reads A shotgun guy falls" loading="lazy"><figcaption>A fight. The message line reads "A SHOTGUN GUY FALLS."</figcaption></figure>
+      <figure><img src="media/shot3.png" alt="A wall running away from the view" loading="lazy"><figcaption>A wall running away from the view.</figcaption></figure>
+      <figure><img src="media/shot4.png" alt="Looking across a room, health 71 percent" loading="lazy"><figcaption>Looking across a room, health down to 71%.</figcaption></figure>
+      <figure><img src="media/shot5.png" alt="Walls up close in four greys, six kills" loading="lazy"><figcaption>Walls up close, in four greys. Six kills so far.</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section id="inside" style="--c: var(--yellow)">
+  <div class="wrap two">
+    <div>
+      <h2>What's in it</h2>
+      <ul class="plain">
+        <li>E1M1's layout, its doors and the exit switch</li>
+        <li>15 of the level's wall textures in four greys, darker where the level is dark</li>
+        <li>Zombiemen, shotgun guys, imps and demons, each with its own pictures, health and attack</li>
+        <li>Health, armour, ammunition, a keycard, barrels, trees and lamps</li>
+        <li>A status bar with a face drawn in block graphics</li>
+        <li>A floor that reflects the walls</li>
+        <li>Sound on the one-bit speaker</li>
+      </ul>
+    </div>
+    <div>
+      <h2 style="--c: var(--red)">Limits</h2>
+      <ul class="plain">
+        <li>One floor height; diagonal walls become steps</li>
+        <li>Monsters always show their front view</li>
+        <li>One kind of ammunition; the fist and the pistol</li>
+        <li>Run so far in trs80gp, not yet on a real Model 4</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="run" style="--c: var(--blue)">
+  <div class="wrap two">
+    <div>
+      <h2>Run it</h2>
+<pre class="cmd">./setup.sh    # zmac, trs80gp, and a Freedoom checkout
+./run.sh      # TRSDOS 6 boots and runs DOOM/CMD
+make test     # the checks</pre>
+      <p class="dim">On a real Model 4 with 128 KB, copy <code>DOOM/CMD</code> to a TRSDOS 6 or LS-DOS 6 disk and
+        type <code>DOOM</code>.</p>
+      <p><a href="README.md">README</a> &middot; <a href="docs/QUIRKS.md">Machine notes</a> &middot; <a href="LICENSE">Licence</a></p>
+    </div>
+    <div>
+      <h2 style="--c: var(--yellow)">Keys</h2>
+      <table class="keys">
+        <tr><td>W / &uarr; &nbsp; S / &darr;</td><td>forward / back</td></tr>
+        <tr><td>A / &larr; &nbsp; D / &rarr;</td><td>turn</td></tr>
+        <tr><td>SPACE</td><td>open a door, press the exit switch</td></tr>
+        <tr><td>F or CTRL</td><td>fire</td></tr>
+        <tr><td>T</td><td>the computer plays; T again takes it back</td></tr>
+        <tr><td>BREAK</td><td>quit</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>The level, textures and sprites are from <a href="https://freedoom.github.io/">Freedoom</a>, by the Freedoom
+      project's contributors, under its BSD-style licence; the screens and the video show Freedoom's art as the
+      Model 4 draws it. DOOM was created by id Software and is a trademark of its owners; this is an unofficial fan
+      project, not affiliated with or endorsed by id Software, Bethesda or ZeniMax. <i>Dancing Demon</i> is by Leo
+      Christopherson. TRS-80 and Tandy are trademarks of their owners. Emulator and assembler: trs80gp and zmac by
+      George Phillips. Code &copy; 2026 Neural Splines LLC, Clear BSD License.</p>
+  </div>
+</footer>
+
+<div class="lb" id="lb"><img alt=""></div>
+
+<script>
+// ---- the TRSDOS prompt types its command
+(function () {
+  const el = document.getElementById('dosline');
+  const text = 'TRSDOS Ready   DOOM';
+  const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce) { el.textContent = text; return; }
+  let i = 0;
+  (function step() { el.textContent = text.slice(0, ++i); if (i < text.length) setTimeout(step, i < 12 ? 40 : 170); })();
+})();
+
+// ---- screenshots open full size
+(function () {
+  const lb = document.getElementById('lb'), img = lb.querySelector('img');
+  document.querySelectorAll('#gallery img').forEach(i => i.addEventListener('click', () => {
+    img.src = i.src; img.alt = i.alt; lb.classList.add('open');
+  }));
+  lb.addEventListener('click', () => lb.classList.remove('open'));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') lb.classList.remove('open'); });
+})();
+
+// ---- the dancing demon: a 64 x 48 block-pixel stage (32 characters by 16 rows of 2 x 3 blocks)
+(function () {
+  const cv = document.getElementById('stage'), g = cv.getContext('2d');
+  const SW = 64, SH = 48, PW = cv.width / SW, PH = cv.height / SH;
+  const W = 24, H = 33;
+  const WHITE = '#f2f2f2', RED = '#e3170a', YELLOW = '#ffd400', G2 = '#262626', G3 = '#555555', G4 = '#9a9a9a';
+
+  function grid() { return Array.from({ length: H }, () => new Uint8Array(W)); }
+  function put(m, x, y, v = 1) { if (x >= 0 && x < W && y >= 0 && y < H) m[y][x] = v; }
+  function line(m, x0, y0, x1, y1, thick, v = 1) {
+    const dx = Math.abs(x1 - x0), dy = -Math.abs(y1 - y0), sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1;
+    let err = dx + dy;
+    for (;;) {
+      put(m, x0, y0, v); if (thick) put(m, x0 + 1, y0, v);
+      if (x0 === x1 && y0 === y1) break;
+      const e2 = 2 * err;
+      if (e2 >= dy) { err += dy; x0 += sx; }
+      if (e2 <= dx) { err += dx; y0 += sy; }
+    }
+  }
+  function rect(m, x0, y0, x1, y1, v = 1) { for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) put(m, x, y, v); }
+
+  // limbs: [elbow/knee, hand/foot] for the left side; the right side mirrors it (x -> 23 - x)
+  const ARM = { down: [[5, 16], [5, 20]], up: [[5, 9], [4, 4]], out: [[4, 12], [1, 10]], hip: [[5, 15], [8, 18]], low: [[4, 14], [2, 18]] };
+  const LEG = { stand: [[9, 26], [9, 31]], kick: [[6, 24], [2, 22]], bent: [[7, 26], [9, 31]], step: [[8, 26], [6, 31]] };
+  const POSES = [
+    { la: 'down', ra: 'down', ll: 'stand', rl: 'stand', dy: 0, tail: 0 },
+    { la: 'up', ra: 'up', ll: 'stand', rl: 'stand', dy: -1, tail: 1 },
+    { la: 'up', ra: 'hip', ll: 'kick', rl: 'stand', dy: 0, tail: 0 },
+    { la: 'hip', ra: 'up', ll: 'stand', rl: 'kick', dy: 0, tail: 1 },
+    { la: 'out', ra: 'out', ll: 'bent', rl: 'bent', dy: 1, tail: 0 },
+    { la: 'out', ra: 'up', ll: 'step', rl: 'stand', dy: 0, tail: 1 },
+    { la: 'low', ra: 'low', ll: 'stand', rl: 'step', dy: 0, tail: 0 },
+    { la: 'hip', ra: 'hip', ll: 'bent', rl: 'bent', dy: 1, tail: 1 },
+  ];
+
+  // cell values: 1 body (white), 2 horns and tail tip (red)
+  function demon(p) {
+    const m = grid(), mir = x => 23 - x;
+    line(m, 8, 4, 6, 0, 0, 2); line(m, 15, 4, 17, 0, 0, 2); put(m, 7, 3, 2); put(m, 16, 3, 2);
+    rect(m, 8, 3, 15, 9); put(m, 8, 3, 0); put(m, 15, 3, 0); put(m, 8, 9, 0); put(m, 15, 9, 0);
+    put(m, 10, 5, 0); put(m, 13, 5, 0);
+    rect(m, 10, 7, 13, 7, 0); put(m, 9, 6, 0); put(m, 14, 6, 0);
+    rect(m, 9, 10, 14, 12); rect(m, 8, 13, 15, 18); rect(m, 9, 19, 14, 21);
+    put(m, 11, 15, 0); put(m, 12, 15, 0);
+    const [le, lh] = ARM[p.la], [re, rh] = ARM[p.ra];
+    line(m, 8, 12, le[0], le[1], 0); line(m, le[0], le[1], lh[0], lh[1], 0); rect(m, lh[0] - 1, lh[1] - 1, lh[0], lh[1]);
+    line(m, 15, 12, mir(re[0]), re[1], 0); line(m, mir(re[0]), re[1], mir(rh[0]), rh[1], 0);
+    rect(m, mir(rh[0]), rh[1] - 1, mir(rh[0]) + 1, rh[1]);
+    const [lk, lf] = LEG[p.ll], [rk, rf] = LEG[p.rl];
+    line(m, 10, 21, lk[0], lk[1], 1); line(m, lk[0], lk[1], lf[0], lf[1], 1);
+    if (p.ll === 'kick') rect(m, lf[0] - 1, lf[1] - 1, lf[0], lf[1]); else rect(m, lf[0] - 2, lf[1], lf[0] + 1, lf[1]);
+    line(m, 13, 21, mir(rk[0]), rk[1], 1); line(m, mir(rk[0]), rk[1], mir(rf[0]), rf[1], 1);
+    if (p.rl === 'kick') rect(m, mir(rf[0]), rf[1] - 1, mir(rf[0]) + 1, rf[1]); else rect(m, mir(rf[0]) - 1, rf[1], mir(rf[0]) + 2, rf[1]);
+    if (p.tail) { line(m, 15, 21, 18, 24); line(m, 18, 24, 21, 22); rect(m, 21, 20, 23, 21, 2); put(m, 22, 19, 2); }
+    else { line(m, 15, 21, 19, 23); line(m, 19, 23, 21, 20); rect(m, 20, 18, 22, 19, 2); put(m, 21, 17, 2); }
+    return m;
+  }
+  const FRAMES = POSES.map(demon);
+
+  function block(x, y, col) { g.fillStyle = col; g.fillRect(Math.round(x * PW) + 1, Math.round(y * PH) + 1, Math.ceil(PW) - 1, Math.ceil(PH) - 1); }
+  function stageSet(t, open) {
+    g.fillStyle = '#000'; g.fillRect(0, 0, cv.width, cv.height);
+    const cw = Math.round(10 - 6 * open);                    // grey curtains draw back while the tune plays
+    for (let y = 4; y < SH - 4; y++)
+      for (let x = 0; x < cw; x++) if ((x + (y >> 3)) % 3 !== 2) { const c = x % 3 ? G3 : G4; block(x, y, c); block(SW - 1 - x, y, c); }
+    for (let x = 0; x < SW; x++) {
+      const sc = 2 + ((x % 8) < 4 ? (x % 4 === 0 || x % 4 === 3 ? 0 : 1) : 0);
+      for (let y = 0; y <= sc + 1; y++) block(x, y, y < 2 ? G4 : G3);
+    }
+    for (let x = 0; x < SW; x++) block(x, SH - 4, WHITE);
+    for (let k = 0; k < 8; k++) {                            // the footlights: the yellow
+      const on = ((k + (t >> 1)) % 4) !== 0;
+      block(4 + k * 8, SH - 2, on ? YELLOW : G2); block(5 + k * 8, SH - 2, on ? YELLOW : G2);
+    }
+  }
+  function drawDemon(f, ox, oy, flip) {
+    const m = FRAMES[f];
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (m[y][x])
+      block(ox + (flip ? W - 1 - x : x), oy + y, m[y][x] === 2 ? RED : WHITE);
+  }
+
+  const DANCE = [0, 1, 0, 1, 2, 3, 2, 3, 4, 5, 4, 5, 6, 7, 6, 1];
+  const TRAVEL = [0, 0, 1, 2, 2, 1, 0, -1, -2, -2, -1, 0, 0, 0, 0, 0];
+  let beat = 0, open = 0, playing = false;
+  function render() {
+    const f = DANCE[beat % DANCE.length], p = POSES[f];
+    stageSet(beat, open);
+    drawDemon(f, 20 + TRAVEL[beat % TRAVEL.length] * 2, SH - 4 - H + p.dy - 1, (beat >> 4) & 1);
+  }
+
+  // a square wave, like the Model 4's speaker; my own little tune
+  const N = { C4: 262, D4: 294, E4: 330, F4: 349, G4: 392, A4: 440, B4: 494, C5: 523, D5: 587, E5: 659, F5: 698, G5: 784, R: 0 };
+  const TUNE = ('E5 G5 E5 C5 D5 E5 C5 G4 A4 C5 A4 F4 G4 B4 D5 R ' +
+                'E5 G5 E5 C5 D5 F5 E5 D5 C5 E5 G4 E4 F4 D4 C4 R').split(' ');
+  let ac = null, gain = null;
+  const tempo = document.getElementById('tempo'), bpm = document.getElementById('bpm'), btn = document.getElementById('play');
+  function beatMs() { return 60000 / (+tempo.value) / 2; }
+  function tick() {
+    if (playing && ac) {
+      const f = N[TUNE[beat % TUNE.length]];
+      if (f) {
+        const o = ac.createOscillator(); o.type = 'square'; o.frequency.value = f; o.connect(gain);
+        const t0 = ac.currentTime; o.start(t0); o.stop(t0 + beatMs() / 1000 * .85);
+      }
+    }
+    beat++; open = playing ? Math.min(1, open + .25) : 0; render();
+    setTimeout(tick, playing ? beatMs() : beatMs() * 2);
+  }
+  tempo.addEventListener('input', () => { bpm.textContent = tempo.value + ' bpm'; });
+  btn.addEventListener('click', () => {
+    if (!ac) { ac = new (window.AudioContext || window.webkitAudioContext)(); gain = ac.createGain(); gain.gain.value = .06; gain.connect(ac.destination); }
+    playing = !playing;
+    if (playing) { ac.resume(); btn.innerHTML = '&#9632; Stop'; } else { btn.innerHTML = '&#9835; Play the tune'; }
+  });
+  render();
+  const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!reduce) setTimeout(tick, 400);
+  else btn.addEventListener('click', () => tick(), { once: true });
+})();
+</script>
+</body>
+</html>

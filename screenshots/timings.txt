@@ -1,0 +1,17 @@
+  breath    0  x   5.50 y  37.50 a   0   STILL cast 335024  figures  36032  walls 112544 (80 strips)  paint figures  21232  = 504832 T  IDENTICAL  [health 100 ammo 50 lives 3 score 000000]
+  breath   20  x   5.50 y  37.50 a  40   STILL cast 341600  figures  28480  walls 113200 (80 strips)  paint figures  12224  = 495504 T  IDENTICAL  [health 100 ammo 50 lives 3 score 000000]
+  breath   21  x   5.50 y  37.50 a  40   STILL cast   3216  figures  10752  walls   9200 ( 0 strips)  paint figures    176  =  23344 T  IDENTICAL  [health 100 ammo 50 lives 3 score 000000]
+  breath   51  x   7.14 y  38.32 a  40   STILL cast 303376  figures  27376  walls 101536 (70 strips)  paint figures  19248  = 451536 T  IDENTICAL  [health 100 ammo 50 lives 3 score 000000]
+  breath   91  x   7.14 y  38.32 a 472   STILL cast 325984  figures  29568  walls 112688 (80 strips)  paint figures  12368  = 480608 T  IDENTICAL  [health 100 ammo 50 lives 3 score 000000]
+  breath  116  x   8.51 y  37.54 a 472   STILL cast 299200  figures  33040  walls  90448 (61 strips)  paint figures  18816  = 441504 T  IDENTICAL  [health 100 ammo 50 lives 3 score 000000]
+  breath  117  x   8.51 y  37.54 a 472   STILL cast   3216  figures  11392  walls   9200 ( 0 strips)  paint figures    176  =  23984 T  IDENTICAL  [health 100 ammo 50 lives 3 score 000000]
+  breath  181  x   8.51 y  37.54 a  88   STILL cast 291008  figures  27936  walls 105328 (71 strips)  paint figures  34480  = 458752 T  IDENTICAL  [health 100 ammo 50 lives 3 score 000000]
+  breath  182  x   8.51 y  37.54 a  88   STILL cast   3216  figures  10816  walls   9328 ( 0 strips)  paint figures    176  =  23536 T  IDENTICAL  [health 100 ammo 50 lives 3 score 000000]
+  breath  222  x   9.60 y  39.73 a  88   STILL cast 264896  figures  21840  walls 113424 (75 strips)  paint figures  25664  = 425824 T  IDENTICAL  [health 100 ammo 50 lives 3 score 000000]
+  breath  223  x   9.60 y  39.73 a  88   STILL cast   3216  figures  10544  walls   9200 ( 0 strips)  paint figures    176  =  23136 T  IDENTICAL  [health 100 ammo 50 lives 3 score 000000]
+11 of 11 glasses identical to the twin
+  breath    0  x  51.50 y  46.50 a 320   STILL cast 333040  figures  32784  walls 115520 (80 strips)  paint figures  79232  = 560576 T  IDENTICAL  [health 100 ammo 50 lives 3 score 000000]
+  breath   16  x  51.50 y  46.50 a 352   STILL cast 332000  figures  40256  walls 115360 (80 strips)  paint figures  96432  = 584048 T  IDENTICAL  [health 71 ammo 50 lives 3 score 000000]
+  breath   48  x  51.50 y  46.50 a 288   STILL cast 344320  figures  33680  walls 113136 (80 strips)  paint figures 117424  = 608560 T  IDENTICAL  [health 47 ammo 50 lives 3 score 000000]
+  breath   49  x  51.50 y  46.50 a 288   STILL cast   3216  figures  34016  walls  72016 (47 strips)  paint figures 118880  = 228128 T  IDENTICAL  [health 40 ammo 50 lives 3 score 000000]
+4 of 4 glasses identical to the twin

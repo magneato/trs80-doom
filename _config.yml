@@ -1,0 +1,12 @@
+# GitHub Pages (Jekyll): index.html is the page; the Markdown files render too
+title: DOOM on the TRS-80 Model 4
+description: Freedoom's E1M1 on a stock 128 KB TRS-80 Model 4, drawn in 2 x 3 block characters
+exclude:
+  - build
+  - tools
+  - freedoom
+  - scripts
+  - test
+  - Makefile
+  - "*.sh"
+  - "*.asm"
